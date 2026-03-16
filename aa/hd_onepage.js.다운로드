@@ -1,0 +1,47 @@
+// ----------------------------------------------------------
+// 사용설명은 https://blog.naver.com/hdesignernet/222947802377 설명서 참조
+// ----------------------------------------------------------
+$(window).scroll( function(){
+	// 점프 버튼 활성화 소스
+	var scroll_position = $(window).scrollTop();
+	var tnum = $(".onepage-jump").length;
+	var now_top = 0;
+	var open_menu = 0;
+	var onepage_jump_arr = [];
+
+	if(tnum > 0){
+
+		for(var i=0;i<tnum;i++){
+			 onepage_jump_arr[i] = $(".onepage-jump").eq(i).offset();
+		}
+
+		for(var i=0;i<tnum;i++){
+			if(onepage_jump_arr[i].top-100 <= scroll_position){
+				open_menu = i;
+			}
+		}
+
+		/* 버튼 활성화 */
+		$('.onepage-jump-bt').removeClass("onepage-jump_on"); //클래스주기
+		$('.onepage-jump-bt').eq(open_menu).addClass("onepage-jump_on"); //클래스주기
+		
+
+		/* 메뉴 top에 붙이기 */
+		if(scroll_position > onepage_jump_arr[0].top){
+			$(".onepage-jump-wrap").css({"position":"fixed","top":"0","width":"100%"});
+			$('.onepage-jump-wrap').addClass("onepage-jump-wrap_on"); //클래스주기
+		}else{
+			$(".onepage-jump-wrap").css({"position":"","top":"","width":""});
+			$('.onepage-jump-wrap').removeClass("onepage-jump-wrap_on"); //클래스주기
+		}
+	}
+});
+
+// 원페이지 메뉴 클릭시 점프
+$(function(){
+	$(".onepage-jump-bt").bind("click",function(){
+		var index_ = $(this).index(".onepage-jump-bt");
+		var bt_position = $(".onepage-jump").eq(index_).offset();
+		$('html, body').animate({scrollTop:bt_position.top-50}, 'slow');
+	})
+});

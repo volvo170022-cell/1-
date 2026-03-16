@@ -1,0 +1,698 @@
+$(document).ready(function() {
+	// ----------------------------------------------------------
+	// 스크롤 에니메이션
+	// ----------------------------------------------------------
+	$('.hd-scrollani').each( function(i){
+		var winHeight = window.innerHeight;
+		var bottom_of_object = $(this).offset().top ;
+		var bottom_of_window = $(window).scrollTop() + winHeight;
+		if($(window).width() < 768){
+			bottom_of_window = bottom_of_window+1100;
+		}
+		if( bottom_of_window > bottom_of_object ){
+			$(this).addClass('hd-scrollani-type');
+		}
+	});
+
+	auto_absolute_height(); //높이자동조절
+	media_chang_img(); //반응형 이미지 교체
+	make_square(); //정사각이미지
+	youtube_resize(); //유투브 리사이즈
+});
+
+$(window).resize(function() {
+	auto_absolute_height(); //높이자동조절
+	media_chang_img(); //반응형 이미지 교체
+	make_square(); //정사각이미지
+	youtube_resize(); //유투브 리사이즈
+});
+
+$(window).scroll( function(){
+
+	auto_absolute_height(); //높이자동조절
+
+	// ----------------------------------------------------------
+	// 스크롤 에니메이션
+	// ----------------------------------------------------------
+	$('.hd-scrollani').each( function(i){
+		var winHeight = window.innerHeight;
+		var bottom_of_object = $(this).offset().top + $(this).outerHeight();
+		var bottom_of_window = $(window).scrollTop() + winHeight; //$(window).height() 정확하지 않음
+		if($(window).width() < 768){
+			bottom_of_window = bottom_of_window+1100;
+		}
+		if( bottom_of_window+300 > bottom_of_object ){
+			$(this).addClass('hd-scrollani-type');
+		}
+		if( bottom_of_window < bottom_of_object-700 ){
+			$(this).removeClass('hd-scrollani-type');
+		}
+	});
+
+
+	// ----------------------------------------------------------
+	// 점프 버튼 활성화 소스
+	// ----------------------------------------------------------
+	var scroll_position = $(window).scrollTop();
+	var tnum = $(".hd-jump").length;
+	var now_top = 0;
+	var open_menu = 0;
+	var hd_jump_arr = [];
+
+	if(tnum > 0){
+
+		for(var i=0;i<tnum;i++){
+			 hd_jump_arr[i] = $(".hd-jump").eq(i).offset();
+		}
+
+		for(var i=0;i<tnum;i++){
+			if(hd_jump_arr[i].top-50 <= scroll_position){
+				open_menu = i;
+			}
+		}
+
+		$('.hd-jump-bt').removeClass("hd-jump_on"); //클래스주기
+		$('.hd-jump-bt').eq(open_menu).addClass("hd-jump_on"); //클래스주기
+
+		/* 버튼 활성화 */
+		if(scroll_position > hd_jump_arr[0].top){
+			$(".hd-jump-wrap").css({"position":"fixed","top":"0","width":"100%"});
+			$('.hd-jump-wrap').addClass("hd-jump-wrap_on"); //클래스주기
+		}else{
+			$(".hd-jump-wrap").css({"position":"","top":"","width":""});
+			$('.hd-jump-wrap').removeClass("hd-jump-wrap_on"); //클래스주기
+		}
+	}
+
+
+
+	// ----------------------------------------------------------
+	// 상단 메인메뉴 스크롤 fixed 1.1
+	// ----------------------------------------------------------
+	var topMenuPosition = $(".fixed_top_menu").eq(0).offset();
+	var fixed_top_menu_num = $(".fixed_top_menu").length;
+
+	if(fixed_top_menu_num > 0){
+		if(scroll_position > topMenuPosition.top){
+			$(".fixed_top_menu:eq(0) > nav").css({"position":"fixed","top":"0"});
+			$(".fixed_top_menu:eq(1) > nav").css({"position":"fixed","top":"0"});
+		}else{
+			$(".fixed_top_menu:eq(0) > nav").css({"position":"absolute","top":"0"});
+			$(".fixed_top_menu:eq(1) > nav").css({"position":"absolute","top":"0"});
+		}	
+	}
+
+	// ----------------------------------------------------------
+	// 상단 메인메뉴 스크롤 fixed 1.2
+	// ----------------------------------------------------------
+	for(i=0;i<$(".hd_fixed_top_menu").length;i++){
+		if(scroll_position > $(".hd_fixed_top_menu").eq(i).offset().top){
+			$(".hd_fixed_top_menu:eq("+i+") > nav").addClass("active");
+		}else{
+			$(".hd_fixed_top_menu:eq("+i+") > nav").removeClass("active");
+		}	
+	}
+
+
+	// ----------------------------------------------------------
+	// 반복사용폼 absolute 이동
+	// ----------------------------------------------------------
+	var hd_duplicate_1 = $(".hd_duplicate_1").offset();
+	var hd_duplicate_2 = $(".hd_duplicate_2").offset();
+
+	if(hd_duplicate_1 != null){
+		var wt2 = (hd_duplicate_1.top*1)+($(".hd_duplicate_1").css("height").replace("px","")*1);
+
+		if(scroll_position > wt2){
+			$(".hd_duplicate_absolute").css({"top":hd_duplicate_2.top,"left":hd_duplicate_2.left});
+		}else{
+			$(".hd_duplicate_absolute").css({"top":hd_duplicate_1.top,"left":hd_duplicate_1.left});
+		}
+	}
+});
+
+
+
+
+// ----------------------------------------------------------
+// 점프메뉴
+// ----------------------------------------------------------
+$(function(){
+	$(".hd-jump-bt").bind("click",function(){
+		var index_ = $(this).index(".hd-jump-bt");
+		var bt_position = $(".hd-jump").eq(index_).offset();
+		$('html, body').animate({scrollTop:bt_position.top}, 'slow');
+	});
+	$(".hd-jump-bt2").bind("click",function(){
+		var index_ = $(this).index(".hd-jump-bt2");
+		var bt_position = $(".hd-jump").eq(index_).offset();
+		$('html, body').animate({scrollTop:bt_position.top}, 'slow');
+	})
+});
+
+
+
+// ----------------------------------------------------------
+// 모달팝업
+// ----------------------------------------------------------
+$(function(){
+	$(".hd-modal_bt").bind("click",function(){
+		var modal_id = $(this).attr("modal");
+		$("."+modal_id).fadeIn();
+		var scroll_Top = $(document).scrollTop();
+		$(".hd-modal-content").css({"top":scroll_Top+50});
+		$("body").css({"height":"100%","overflow":"hidden"});
+	});
+
+	$('.hd-modal .hd-modal-bg').click(function () {
+		$(".hd-modal").fadeOut();
+		$("body").css({"height":"","overflow":""});
+	});
+
+	$('.hd-modal .hd-modal-content .modal-close').click(function () {
+		$(".hd-modal").fadeOut();
+		$("body").css({"height":"","overflow":""});
+	});
+});
+
+
+
+
+
+
+// ----------------------------------------------------------
+// 전화번호 포멧
+// ----------------------------------------------------------
+function hd_phon_type( obj ) { 
+	var objStr = obj.value;
+	if(objStr.length > 13 ){
+		obj.value = objStr.substr(0,13);
+		return false;
+	}
+	obj.value =  PhonNumStr( obj.value );  
+}
+
+function PhonNumStr( str ){ 
+	var RegNotNum  = /[^0-9]/g; 
+	var RegPhonNum = ""; 
+	var DataForm   = ""; 
+
+	// return blank     
+	if( str == "" || str == null ) return ""; 
+	
+	// delete not number
+	str = str.replace(RegNotNum,''); 
+
+	if( str.length < 4 ) return str; 
+
+	if( str.length > 3 && str.length < 7 ) { 
+	   	DataForm = "$1-$2"; 
+		RegPhonNum = /([0-9]{3})([0-9]+)/; 
+	} else if(str.length == 7 ) {
+		DataForm = "$1-$2"; 
+		RegPhonNum = /([0-9]{3})([0-9]{4})/; 
+	} else if(str.length == 9 ) {
+		DataForm = "$1-$2-$3"; 
+		RegPhonNum = /([0-9]{2})([0-9]{3})([0-9]+)/; 
+	} else if(str.length == 10){ 
+		if(str.substring(0,2)=="02"){
+			DataForm = "$1-$2-$3"; 
+			RegPhonNum = /([0-9]{2})([0-9]{4})([0-9]+)/; 
+		}else{
+			DataForm = "$1-$2-$3"; 
+			RegPhonNum = /([0-9]{3})([0-9]{3})([0-9]+)/;
+		}
+	} else if(str.length > 10){ 
+		DataForm = "$1-$2-$3"; 
+		RegPhonNum = /([0-9]{3})([0-9]{4})([0-9]+)/; 
+	} 
+	
+	while( RegPhonNum.test(str) ) {  
+		str = str.replace(RegPhonNum, DataForm);  
+	} 
+	return str; 
+}
+
+
+
+// ----------------------------------------------------------
+// 숫자 3자리마다 쉼표
+// ----------------------------------------------------------
+function numberCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// ----------------------------------------------------------
+// 숫자증가 에니메이션
+// ----------------------------------------------------------
+function animateText(t){
+	var progressRate = $("."+t).attr("data-rate");
+
+	$({ val : 0 }).animate({ val : progressRate }, {
+	 duration: 2000,
+	step: function() {
+	  var num = numberCommas(Math.floor(this.val));
+	  $("."+t).text(num);
+	},
+	complete: function() {
+	  var num = numberCommas(Math.floor(this.val));
+	  $("."+t).text(num);
+	}
+	});
+}
+
+// ----------------------------------------------------------
+// 자동페이드roop
+// ----------------------------------------------------------
+var bgroop1_num = 1;
+var bgroop2_num = 1;
+var bgroop3_num = 1;
+
+function bgroop1(){	
+	var leng = $(".bgroop1").length;
+
+	if(leng <= bgroop1_num){
+		bgroop1_num = 1;
+	}else{
+		bgroop1_num++;
+	}
+
+	$(".bgroop1").css({"opacity":"0"});
+	$(".bgroop1").eq(bgroop1_num-1).css({"opacity":"1"});
+}
+function bgroop2(){	
+	var leng = $(".bgroop2").length;
+
+	if(leng <= bgroop2_num){
+		bgroop2_num = 1;
+	}else{
+		bgroop2_num++;
+	}
+
+	$(".bgroop2").css({"opacity":"0"});
+	$(".bgroop2").eq(bgroop2_num-1).css({"opacity":"1"});
+
+
+}
+function bgroop3(){	
+	var leng = $(".bgroop3").length;
+
+	if(leng <= bgroop3_num){
+		bgroop3_num = 1;
+	}else{
+		bgroop3_num++;
+	}
+
+	$(".bgroop3").css({"opacity":"0"});
+	$(".bgroop3").eq(bgroop3_num-1).css({"opacity":"1"});
+}
+
+
+// ----------------------------------------------------------
+// 점프버튼 (class 위치로 점프)
+// ----------------------------------------------------------
+function jump_class(bt){
+	var bt_position = $("."+bt).offset();
+	$('html, body').animate({scrollTop:bt_position.top}, 'slow');
+}
+
+
+// ----------------------------------------------------------
+// 온오프 (w,h 가 있으면 반응형X)
+// ----------------------------------------------------------
+function onoff_obj(obj,w,h,p,c,objbt)
+{
+	var onImage = $("."+obj).attr("onImage");
+	var offImage = $("."+obj).attr("offImage");
+	var onBtText = $("."+objbt).attr("onBtText");
+	var offBtText = $("."+objbt).attr("offBtText");
+	var window_position = $(window).scrollTop();
+
+	if(!w && !h){
+	}else{
+		if(obj == "hd_popup_new"){
+			if($(window).width() > 768){
+				$("#hd_popup_new ").css({"width":w+"px","height":h+"px"});
+				$("#hd_popup_new ").find("iframe").css({"width":"100%","height":"100%"});
+			}else{
+				$("#hd_popup_new ").css({"width":"85%"});
+				$("#hd_popup_new ").find("iframe").css({"width":"100%","height":"80vh"});
+			}
+		}
+	}
+
+	if(obj == "hd_popup_new"){
+		onoff_obj('hd_black','','','fade');
+	}
+	$("#hd_popup_new").find("iframe").attr("src","");//초기화
+	if(obj != "hd_black"){
+		$("#hd_popup_new").removeClass("youtube");//유투브용 창을 띄운 경우 때문에 초기화시키기
+		$("#hd_popup_new").removeClass("shorts");//유투브용 창을 띄운 경우 때문에 초기화시키기
+	}
+	
+	if(c == "block"){
+		if(p == "ani"){
+			$("#"+obj).slideDown();
+			$("."+obj).slideDown();
+		}else if(p == "fade"){
+			$("#"+obj).fadeIn();
+			$("."+obj).fadeIn();
+		}else{
+			$("#"+obj).show();
+			$("."+obj).show();
+		}
+		
+		//img교체
+		if(onImage){
+			$("."+obj).attr({"src":onImage});
+		}
+		//text교체
+		if(onBtText){
+			$("."+objbt).html(onBtText);
+		}
+	}else if($("#"+obj).css("display") && ($("#"+obj).css("display") != "none" || c == "none")){
+		if(p == "ani"){
+			$("#"+obj).slideUp();
+		}else if(p == "fade"){
+			$("#"+obj).fadeOut();
+		}else{
+			$("#"+obj).hide();
+			$(".onoff_obj_wrap").hide(); //무조건 닫는요소 (암전배경클릭시 닫기위해서.)
+		}
+		
+		//img교체
+		if(offImage){
+			$("."+obj).attr({"src":offImage});
+		}
+
+		//text교체
+		if(offBtText){
+			$("."+objbt).html(offBtText);
+		}
+	}else if($("."+obj).css("display") && ($("."+obj).css("display") != "none" || c == "none")){
+		if(p == "ani"){
+			$("."+obj).slideUp();
+		}else if(p == "fade"){
+			$("."+obj).fadeOut();
+		}else{
+			$("."+obj).hide();
+			$(".onoff_obj_wrap").hide(); //무조건 닫는요소 (암전배경클릭시 닫기위해서.)
+		}
+		
+		//img교체
+		if(offImage){
+			$("."+obj).attr({"src":offImage});
+		}
+
+		//text교체
+		if(offBtText){
+			$("."+objbt).html(offBtText);
+		}
+	}else{
+		if(p == "ani"){
+			$("#"+obj).slideDown();
+			$("."+obj).slideDown();
+		}else if(p == "fade"){
+			$("#"+obj).fadeIn();
+			$("."+obj).fadeIn();
+		}else{
+			$("#"+obj).show();
+			$("."+obj).show();
+		}
+		
+		//img교체
+		if(onImage){
+			$("."+obj).attr({"src":onImage});
+		}
+		//text교체
+		if(onBtText){
+			$("."+objbt).html(onBtText);
+		}
+	}
+
+	bodylock(); //암전 on off에 따라 배경스크롤 on off
+}
+
+// ----------------------------------------------------------
+// 암전팝업시 body 잠그기
+// ----------------------------------------------------------
+function bodylock(){
+	if($("#hd_black").css("display") == "block"){
+		$("body").css({"height":"100vh","overflow":"hidden"});
+	}else{
+		$("body").css({"height":"100%","overflow":"auto"});
+	}
+}
+
+// ----------------------------------------------------------
+// 부모아이프레임 자동 리사이즈
+// ----------------------------------------------------------
+function parent_iframe_resize(){
+	var h = parseInt(document.body.scrollHeight);
+	$(top.document).find(".iframe_auto_height").css({"height":h,"box-sizing":"border-box"});
+	//window.frameElement.style.height
+}
+
+
+// ----------------------------------------------------------
+// 우측 장바구니 나오기 (left,right,top,bottom 모두 사용가능)
+// ----------------------------------------------------------
+function hd_left_right_on(obj,type,size,addAction){
+	if(type=="left" || type=="right"){
+		$("#"+obj).css({"width":size+"px","height":"100%",type:"-"+size+"px","z-index":"100001","box-sizing":"border-box","transition":"all 0.5s"});
+	}else{
+		$("#"+obj).css({"width":"100%","height":size+"px",type:"-"+size+"px","z-index":"100001","box-sizing":"border-box","transition":"all 0.5s"});
+	}
+
+	if($("#"+obj).css(type) == "-"+size+"px"){
+		$("#"+obj).css(type,"0px");
+		if(addAction == "bg"){
+			$("#hd_black").show();
+		}		
+	}else{
+		$("#"+obj).css(type,"-"+size+"px");
+		if(addAction == "bg"){
+			$("#hd_black").hide();
+		}
+	}
+}
+
+// ----------------------------------------------------------
+// 높이 자동으로 조절 (absolute 사용시)
+// ----------------------------------------------------------
+function auto_absolute_height(){
+	$(".hd_auto_height").css({"height":$(".hd_auto_height_absolute").css("height")}); //높이 자동벌리기
+}
+
+// ----------------------------------------------------------
+// 반응형 이미지 교체
+// ----------------------------------------------------------
+function media_chang_img(){
+	for(var i=0;i<$(".media_chang_img").length;i++){
+		var media_src1 = $(".media_chang_img").eq(i).attr("media_src1");
+		var media_src2 = $(".media_chang_img").eq(i).attr("media_src2");
+
+		if(media_src2 && media_src1){
+			if($(window).width() < 768){
+				$('.media_chang_img').eq(i).attr("src",media_src1);
+			}else{
+				$('.media_chang_img').eq(i).attr("src",media_src2);
+			}	
+		}
+	}
+
+}
+
+// ----------------------------------------------------------
+// 정사각이미지
+// ----------------------------------------------------------
+function make_square(){
+	for(i=0;i<$('.hd_square').length;i++){
+		  var width = $('.hd_square').eq(i).css('width');
+		  $('.hd_square').eq(i).css({"height":width});
+	}
+}
+
+// ----------------------------------------------------------
+// 마우스 over 시 이미지 교체
+// ----------------------------------------------------------
+$(function(){
+	$(".over_chang_img").bind("mouseenter",function(){
+		var index_ = $(this).index(".over_chang_img");
+		var ovimg2 = $(".over_chang_img").eq(index_).find(".over_chang_img_obj").attr("over_src2");
+		$(".over_chang_img").eq(index_).find(".over_chang_img_obj").attr({"src":ovimg2});
+	});
+	
+	$(".over_chang_img").bind("mouseleave",function(){
+		var index_ = $(this).index(".over_chang_img");
+		var ovimg1 = $(".over_chang_img").eq(index_).find(".over_chang_img_obj").attr("over_src1");
+		$(".over_chang_img").eq(index_).find(".over_chang_img_obj").attr({"src":ovimg1});
+	});
+});
+
+// ----------------------------------------------------------
+// 숫자를 특정 단위로만 입력받게 하기
+// ----------------------------------------------------------
+$(function(){
+	//숫자를 특정 단위로만 입력받게 하기
+	$(".hd_unit_num").blur(function(){
+		var unit_num = $(this).attr("unit_num");
+		var num = $(this).val();
+		if(num % unit_num){
+			alert(unit_num+"개 단위로 입력해주세요.");
+			$(this).val(unit_num);
+		}
+	});
+
+	//숫자만 입력하기
+	$(".hd_only_number").keyup(function(){
+		var num = $(this).val().trim();
+		$(this).val(num);
+		if(!isFinite(num)){
+			$(this).val(1); //숫자가 아닐경우 1입력
+		}
+	});
+})
+
+// ----------------------------------------------------------
+// 탭버튼
+// ----------------------------------------------------------
+$(function(){
+	$(".hd_tap > li > a").bind("click",function(){
+		var index_ = $(this).index(".hd_tap > li > a");
+
+		$(".hd_tap > li > a").removeClass("active");
+		$(".hd_tap > li:eq("+index_+") > a").addClass("active");
+
+		$(".hd_tap_con > li").removeClass("active");
+		$(".hd_tap_con > li:eq("+index_+")").addClass("active");
+	});
+});
+
+
+// ----------------------------------------------------------
+// 유투브 리사이즈
+// ----------------------------------------------------------
+function youtube_resize(){
+	  var videoWidth = $('.hd_youtube_resize iframe').width(); // 동영상 iframe의 너비
+	  var videoHeight = videoWidth * 9 / 16; // 동영상 iframe의 높이 (16:9 비율)
+	  //$('.hd_youtube_resize iframe').css({"width":"100%"}); 
+	  $('.hd_youtube_resize iframe').height(videoHeight); // 동영상 iframe의 높이를 설정
+}
+
+
+
+// ----------------------------------------------------------
+// 휠 점프
+// ----------------------------------------------------------
+// hd-wheel 의 섹션수량 체크
+$(function(){
+	const hd_sections = document.querySelectorAll('.hd-wheel');
+
+	var hd_currentSectionIndex = 0; //현재 섹션 index
+	var hd_nextSectionIndex = 0; //다음 섹션 index
+
+	// 섹션별 index 업데이트
+	function hd_updateCurrentSectionIndex() {
+		
+
+		hd_sections.forEach((section, index) => {
+		  const rect = section.getBoundingClientRect();		  
+		  if (rect.top <= window.innerHeight && rect.bottom >= window.innerHeight) {
+			hd_currentSectionIndex = index;
+		  }
+		});
+	}
+
+	function hd_handleWheel(event) {
+		  hd_updateCurrentSectionIndex();
+		  //console.log('Current Section Index0:', hd_currentSectionIndex);
+
+		  // 휠을 내릴때..
+		  if(event.deltaY > 0) {
+
+				if(hd_nextSectionIndex != hd_currentSectionIndex){
+					var goPosition = $(".hd-wheel").eq(hd_currentSectionIndex).offset();
+					$('html,body').animate( { scrollTop:goPosition.top },'1000' );
+					hd_nextSectionIndex = hd_currentSectionIndex;
+					//console.log('Current Section Index1:', hd_currentSectionIndex);
+				}
+
+		  
+		  // 휠을 올릴때..
+		  } else if (event.deltaY < 0) {
+
+				if(hd_currentSectionIndex-1 > -1){
+					if(hd_nextSectionIndex != hd_currentSectionIndex-1){
+						var goPosition = $(".hd-wheel").eq(hd_currentSectionIndex-1).offset();
+						$('html,body').animate( { scrollTop:goPosition.top },'1000' );
+						hd_nextSectionIndex = hd_currentSectionIndex-1;
+						//console.log('Current Section Index2:', hd_currentSectionIndex-1);
+					}
+				}
+		  }
+
+		  $('.hd-wheel').removeClass("active"); //클래스주기
+		  $('.hd-wheel').eq(hd_nextSectionIndex).addClass("active"); //클래스주기
+
+		  window.removeEventListener('wheel', hd_handleWheel); // 이벤트 리스너 제거
+		  setTimeout(function(){
+			window.addEventListener('wheel', hd_handleWheel);
+		  },10);
+	  
+	}
+	window.addEventListener('wheel', hd_handleWheel);
+})
+
+
+// ----------------------------------------------------------
+// 툴팁이나 메뉴용. 마우스 오버시 바로 하위의 hd_tooltip_container를 활성화
+// ----------------------------------------------------------
+$(function(){
+	  $(".hd_tooltip2").mouseenter(function(){
+		$(this).find(".hd_tooltip_con2").slideDown();
+		$(this).find(".hd_tooltip2").addClass("active");
+	  }).mouseleave(function(){
+		$(this).find(".hd_tooltip_con2").stop(true, true).slideUp();
+		$(this).find(".hd_tooltip2").removeClass("active");
+	  });
+});
+
+// ----------------------------------------------------------
+// faq용
+// ----------------------------------------------------------
+$(function(){
+	  $(".hd_tooltip_bt3").bind("click",function(){
+			$(".hd_tooltip_con3").end().slideUp();
+			$(".hd_tooltip3").removeClass("active");
+
+			$(this).parent().find(".hd_tooltip_con3").slideDown();
+			$(this).parent().addClass("active");
+	  });
+});
+
+
+
+// ----------------------------------------------------------
+// 유투브 암전팝업 youtube.php 파일과 혼용사용
+// ----------------------------------------------------------
+function hd_youtube_popup(obj,type){
+	if(type == "shorts"){
+		$("#hd_popup_new").addClass("shorts");
+	}else{
+		$("#hd_popup_new").addClass("youtube");
+	}
+
+	if(obj == "hd_popup_new"){
+		onoff_obj('hd_black','','','fade','block');
+	}
+
+	$("#hd_popup_new").find("iframe").attr("src",""); //초기화	
+	$("#"+obj).show();
+}
+
+// ----------------------------------------------------------
+// 암전팝업 & 아이프레임타겟
+// ----------------------------------------------------------
+document.write("<div id='hd_popup_new'><div class='hd_close' onclick=\"onoff_obj('hd_popup_new');onoff_obj('hd_black');bodylock();\"><i>&nbsp;</i></div><iframe name='hd_iframe' src='' width='0' height='0' scrolling='auto' marginwidth='0' marginheight='0' class='iframe_auto_height'></iframe></div>");
+document.write("<div id='hd_black' onclick=\"onoff_obj('hd_popup_new','','','','none');onoff_obj('hd_black','','','','none');bodylock();\">&nbsp;</div>");
